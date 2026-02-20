@@ -52,12 +52,34 @@ const crocBalanceSpans = document.querySelectorAll(".current-croc-balance");
 const totalCrocsSpans = document.querySelectorAll(".total-croc-count")
 let crocBalance = getCookie("croc-balance") != false ? getCookie("croc-balance") : 0;
 let totalCrocs = getCookie("total-crocs") != false ? getCookie("total-crocs") : 0;
+let comboMult = 1;
+let clickHistory = [];
 function makeCroc() {
-    crocBalance += 1;
-    totalCrocs += 1;
+    clickHistory.push(new Date());
+    if (clickHistory.length > 10) {
+        clickHistory.shift();
+    }
+    crocBalance += 1 * comboMult;
+    totalCrocs += 1 * comboMult;
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
 }
+
+const comboBar = document.querySelector("#combo-bar");
+const comboClassArray = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "full"]
+const greg = document.querySelector("#greg");
+const mrSeal = document.querySelector("#mr-seal");
+function updateCombo() {
+    const maintainCombo = new Date().getTime() - clickHistory[clickHistory.length-1].getTime() < 1000 ? true : false;
+    if (maintainCombo) {
+        if (comboBar.getAttribute("class") != "full") {
+            comboBar.setAttribute("class", comboClassArray[comboClassArray.indexOf(comboBar.getAttribute("class")) + 1]);
+        }
+    } else {
+        if (comboBar.getAttribute("class") != "") comboBar.setAttribute("class", comboClassArray[comboClassArray.indexOf(comboBar.getAttribute("class")) - 1]);
+    }
+}
+setInterval(updateCombo, 1000);
 
 const crocImgArray = [
     "./images/backDirectR.png",
