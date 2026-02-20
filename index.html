@@ -2,17 +2,36 @@
 <html>
     <head>
         <link rel="stylesheet" href="./styles.css" />
-        <link rel="icon" href="https://art.pixilart.com/thumb/sr2de7dcc6f4743.png" />
+        <link rel="icon" href="./images/figmentFavicon.png" />
         <title>Figment's Croc Factory</title>
     </head>
     <body>
-        <h1>Figment's Croc Factory</h1>
+        <div id="factory-door" class="hidden">
+            <h1>Figment's Croc Factory</h1>
+            <button id="factory-door-btn">Clock in!</button>
+        </div>
+
+        <div id="factory-interface">
+            <div id="stats"></div>
+            <div id="factory-heart">
+                <div id="counter-div">
+                    <p id="current-croc-balance">Current croc balance: <span class="current-croc-balance"></span></p>
+                    <p id="total-croc-count">Total crocs manufactured: <span class="total-croc-count"></span></p>
+                </div>
+                <div id="machine-div">
+                    <div id="croc-img-div">
+                        <img src="./images/outsideDirectR.png" />
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="info-div">
             <div>
                 <div id="info-toggle" class="hidden">
                     <h3>Figment's Croc Factory</h3>
                     <p>Created by <a href="https://funkyghost.xyz/" target="_blank">Lawrence Hapeman</a></p>
+                    <p><a href="https://github.com/funkyghost617/figmentsCrocFactory" target="_blank">View source code</a></p>
                     <p>Operator name: <span class="operator-name"></span></p>
                     <button id="change-operator-name">Change operator name</button>
                 </div>

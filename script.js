@@ -33,8 +33,49 @@ logAllBtn.addEventListener("click", (e) => {
     })
 });
 
+const factoryDoor = document.querySelector("#factory-door");
+const factoryDoorBtn = document.querySelector("#factory-door-btn");
+factoryDoorBtn.addEventListener("click", (e) => {
+    factoryDoor.animate([
+        { top: "0" },
+        { top: "calc(-100vh)" },
+        { top: "calc(-100vh)" }
+    ], {
+        duration: 2500,
+        iterations: 1
+    });
+    populateFromCookies();
+    setTimeout(() => factoryDoor.classList.add("hidden"), 2000);
+})
 
-populateFromCookies();
+const crocBalanceSpans = document.querySelectorAll(".current-croc-balance");
+const totalCrocsSpans = document.querySelectorAll(".total-croc-count")
+let crocBalance = getCookie("croc-balance") != false ? getCookie("croc-balance") : 0;
+let totalCrocs = getCookie("total-crocs") != false ? getCookie("total-crocs") : 0;
+function makeCroc() {
+    crocBalance += 1;
+    totalCrocs += 1;
+    crocBalanceSpans.forEach(span => span.textContent = crocBalance);
+    totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
+}
+
+const crocImgArray = [
+    "./images/backDirectR.png",
+    "./images/bottomDirectR.png",
+    "./images/outsideDirectR.png",
+    "./images/topDirectR.png"
+]
+const crocImgDiv = document.querySelector("#croc-img-div");
+const crocImg = document.querySelector("#croc-img-div img");
+crocImgDiv.addEventListener("click", (e) => {
+    let currentSrc = crocImg.getAttribute("src");
+    let newSrc = currentSrc;
+    while (newSrc == currentSrc) {
+        newSrc = crocImgArray[Math.floor(Math.random()*4)];
+    }
+    crocImg.setAttribute("src", newSrc);
+    makeCroc();
+})
 
 function populateFromCookies() {
     if (!getCookie("operator-name")) {
@@ -45,7 +86,10 @@ function populateFromCookies() {
         setCookie("operator-name", newName, 365);
     }
     operatorNameSpans.forEach(span => { span.textContent = getCookie("operator-name") });
+    crocBalanceSpans.forEach(span => span.textContent = crocBalance);
+    totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
 }
+populateFromCookies();
 
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();

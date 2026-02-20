@@ -3,11 +3,65 @@
 }
 
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+#factory-door {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 3;
+    background-color: white;
+}
+
+#factory-interface {
+    width: 900px;
+    height: 800px;
+    border: 2px solid black;
+    display: flex;
+}
+
+#stats {
+    width: 30%;
+    height: 100%;
+}
+
+#factory-heart {
+    width: 70%;
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#counter-div {
+    display: flex;
+    width: 50%;
+    margin-left: 20%;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+}
+
+#croc-img-div {
+    width: 500px;
+    height: 500px;
+}
+
+#croc-img-div img {
+    width: 100%;
+    height: 100%;
 }
 
 #info-div {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 0;
 }
