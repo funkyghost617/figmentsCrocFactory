@@ -1,0 +1,43 @@
+* {
+    box-sizing: border-box;
+}
+
+.hidden {
+    display: none;
+}
+
+#info-div {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+#info-div > div {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-end;
+}
+
+#info-div > div > div {
+    border: 2px solid black;
+}
+
+#info-img {
+    width: 50px;
+    height: 50px;
+}
+
+#info-img:hover,
+#info-toggle:not(.hidden) + #info-img {
+    background-color: lightgray;
+    border-radius: 50%;
+}
+
+#manage-data-div {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-end;
+}

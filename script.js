@@ -1,17 +1,50 @@
-const textInput = document.querySelector("#text");
-const title = document.querySelector("h1");
-populateFromCookies();
-
-textInput.addEventListener("keydown", (e) => {
-    if (e.key == "Enter") {
-        setCookie("title", textInput.value, 365);
-        textInput.value = "";
-        populateFromCookies();
+const infoImg = document.querySelector("#info-img");
+const infoToggle = document.querySelector("#info-toggle");
+const operatorNameSpans = document.querySelectorAll(".operator-name");
+const operatorNameBtn = document.querySelector("#change-operator-name");
+infoImg.addEventListener("click", (e) => {
+    if (infoToggle.classList.contains("hidden")) {
+        infoToggle.classList.remove("hidden");
+    } else {
+        infoToggle.classList.add("hidden");
     }
 })
+operatorNameBtn.addEventListener("click", (e) => {
+    let newName = "";
+    while (newName == "" ) {
+        newName = prompt("Please enter your name (this can be changed at any time)", "");
+    }
+    setCookie("operator-name", newName, 365);
+    populateFromCookies();
+})
+
+const clearDataBtn = document.querySelector("#clear-data-btn");
+clearDataBtn.addEventListener("click", (e) => {
+    deleteAllCookies();
+    window.location.href = "/";
+});
+const logAllBtn = document.querySelector("#log-all-btn");
+logAllBtn.addEventListener("click", (e) => {
+    console.log(document.cookie);
+    cookieStore.getAll().then(cookies => {
+        cookies.forEach(cookie => {
+            console.log(cookie);
+        })
+    })
+});
+
+
+populateFromCookies();
 
 function populateFromCookies() {
-    title.textContent = getCookie("title");
+    if (!getCookie("operator-name")) {
+        let newName = "";
+        while (newName == "" ) {
+            newName = prompt("Please enter your name (this can be changed at any time)", "");
+        }
+        setCookie("operator-name", newName, 365);
+    }
+    operatorNameSpans.forEach(span => { span.textContent = getCookie("operator-name") });
 }
 
 function setCookie(cname, cvalue, exdays) {
@@ -34,7 +67,7 @@ function getCookie(cname) {
             return c.substring(name.length, c.length);
         }
     }
-    return "ERROR: no cookie found named \"" + cname + "\"";
+    return false;
 }
 
 function deleteCookie(cname) {
