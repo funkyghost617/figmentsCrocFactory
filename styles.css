@@ -252,3 +252,27 @@ body {
     flex-flow: column nowrap;
     align-items: flex-end;
 }
+
+#event-modal > div {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+#event-modal > div > div:first-child {
+    width: 300px;
+}
+
+#event-modal > div > div:nth-child(2) {
+    width: 400px;
+    height: 550px;
+}
+
+#event-modal img {
+    max-height: 450px;
+    margin-bottom: 30px;
+    display: block;
+}
+
+#event-modal button {
+    font-size: 1.2rem;
+}

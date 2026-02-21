@@ -21,7 +21,6 @@ operatorNameBtn.addEventListener("click", (e) => {
 const clearDataBtn = document.querySelector("#clear-data-btn");
 clearDataBtn.addEventListener("click", (e) => {
     deleteAllCookies();
-    window.location.href = "/";
 });
 const logAllBtn = document.querySelector("#log-all-btn");
 logAllBtn.addEventListener("click", (e) => {
@@ -47,7 +46,10 @@ factoryDoorBtn.addEventListener("click", (e) => {
         duration: 2500,
         iterations: 1
     });
-
+    
+    if (getCookie("tutorial-complete") != "true") {
+        setTimeout(() => startEvent("tutorial0"), 1200);
+    }
     mainMusic = new Audio("./audio/housekeepingCaustic.mp3");
     mainMusic.loop = true;
     mainMusic.play();
@@ -67,8 +69,8 @@ function makeCroc() {
     if (clickHistory.length > 10) {
         clickHistory.shift();
     }
-    crocBalance += 1 * comboMult;
-    totalCrocs += 1 * comboMult;
+    crocBalance = Number(crocBalance) + (1 * comboMult);
+    totalCrocs = Number(totalCrocs) + (1 * comboMult);
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
     //playSound("./audio/explosion.mp3");
@@ -164,6 +166,45 @@ crocImgDiv.addEventListener("click", (e) => {
     makeCroc();
 })
 
+let eventArrays = {
+    "endEvent": [ setCookie("tutorial-complete", "true", 365) ],
+    "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
+    "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
+    "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will lose my strength in this world forever", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
+    "tutorial3": ["Tutorial", "Anyways, let's get started!", "Just click on the croc to operate the factory.", "./images/figmentFullBody.png", "OKAY!", "endEvent0", false, false, false, false],
+};
+const eventModal = document.querySelector("#event-modal");
+const eventTitle = document.querySelector("#event-modal h2");
+const eventPara1 = document.querySelector("#event-modal p:nth-child(2)");
+const eventPara2 = document.querySelector("#event-modal p:nth-child(3)");
+const eventImg = document.querySelector("#event-modal img");
+const eventBtn1 = document.querySelector("#event-modal button:nth-child(2)");
+const eventBtn2 = document.querySelector("#event-modal button:nth-child(3)");
+const eventBtn3 = document.querySelector("#event-modal button:nth-child(4)");
+function startEvent(eventName) {
+    if (eventName.contains("endEvent")) {
+        eventModal.close();
+        eventArrays["endEvent"][Number(eventName.slice(8))];
+        return;
+    }
+    const eventArray = eventArrays[eventName];
+    eventTitle.textContent = eventArray[0];
+    eventPara1.textContent = eventArray[1];
+    eventPara2.textContent = eventArray[2];
+    eventImg.setAttribute("src", eventArray[3]);
+    eventBtn1.textContent = eventArray[4];
+    eventBtn1.addEventListener("click", (e) => startEvent(eventArray[5]));
+    if (eventArray[6] != false) {
+        eventBtn2.textContent = eventArray[6];
+        eventBtn2.addEventListener("click", (e) => startEvent(eventArray[7]));
+    } else eventBtn2.hidden = true;
+    if (eventArray[8] != false) {
+        eventBtn3.textContent = eventArray[8];
+        eventBtn3.addEventListener("click", (e) => startEvent(eventArray[9]));
+    } else eventBtn3.hidden = true;
+    eventModal.showModal();
+}
+
 function populateFromCookies() {
     if (!getCookie("operator-name")) {
         let newName = "";
@@ -177,6 +218,12 @@ function populateFromCookies() {
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
 }
 populateFromCookies();
+
+function updateCookies() {
+    setCookie("croc-balance", crocBalance, 365);
+    setCookie("total-crocs", totalCrocs, 365)
+}
+setInterval(updateCookies, 10000);
 
 function setCookie(cname, cvalue, exdays) {
     const d = new Date();
