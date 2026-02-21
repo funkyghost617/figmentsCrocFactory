@@ -31,6 +31,10 @@ logAllBtn.addEventListener("click", (e) => {
         })
     })
 });
+const reloadPageBtn = document.querySelector("#reload-page-btn");
+reloadPageBtn.addEventListener("click", (e) => {
+    window.location.reload();
+})
 
 let mainMusic;
 let soundEffects = [];
@@ -170,7 +174,7 @@ let eventArrays = {
     "endEvent": [ true ],
     "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
     "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
-    "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will lose my strength in this world forever", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
+    "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will lose my strength in this world forever.", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
     "tutorial3": ["Tutorial", "Anyways, let's get started!", "Just click on the croc to operate the factory.", "./images/figmentFullBody.png", "OKAY!", "endEvent0", false, false, false, false],
 };
 const eventModal = document.querySelector("#event-modal");
