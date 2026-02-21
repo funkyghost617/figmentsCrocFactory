@@ -53,12 +53,13 @@ const totalCrocsSpans = document.querySelectorAll(".total-croc-count")
 let crocBalance = getCookie("croc-balance") != false ? getCookie("croc-balance") : 0;
 let totalCrocs = getCookie("total-crocs") != false ? getCookie("total-crocs") : 0;
 let comboMult = 1;
-let clickHistory = [];
+let clickHistory = [new Date()];
 function makeCroc() {
     clickHistory.push(new Date());
     if (clickHistory.length > 10) {
         clickHistory.shift();
     }
+    //updateCombo();
     crocBalance += 1 * comboMult;
     totalCrocs += 1 * comboMult;
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
@@ -66,26 +67,69 @@ function makeCroc() {
 }
 
 const comboBar = document.querySelector("#combo-bar");
-const comboClassArray = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "full"]
+const currentComboSpan = document.querySelector("#current-combo");
+currentComboSpan.textContent = comboMult;
 const greg = document.querySelector("#greg");
 const mrSeal = document.querySelector("#mr-seal");
 function updateCombo() {
-    const maintainCombo = new Date().getTime() - clickHistory[clickHistory.length-1].getTime() < 1000 ? true : false;
+    const maintainCombo = new Date().getTime() - clickHistory[clickHistory.length-1].getTime() < 400 ? true : false;
+    if (comboBar.classList.contains("full")) {
+        if (!maintainCombo) {
+            const maintainFull = new Date().getTime() - clickHistory[clickHistory.length-1].getTime() < 3000 ? true : false;
+            if (maintainFull) {
+                return;
+            }
+        } else {
+            return;
+        }
+    }
     if (maintainCombo) {
-        if (comboBar.getAttribute("class") != "full") {
-            comboBar.setAttribute("class", comboClassArray[comboClassArray.indexOf(comboBar.getAttribute("class")) + 1]);
+        if (comboBar.classList.contains("full")) {
+            console.log("already full!");
+        } else if (comboBar.getAttribute("style") == "background-position: 2%" || Number(comboBar.getAttribute("style").split(": ")[1].slice(0, -1)) <= 0) {
+            comboBar.classList.add("full");
+            greg.classList.add("rainbow-animation0");
+            mrSeal.classList.add("rainbow-animation1");
+            comboBar.removeAttribute("style");
+            updateComboVar(2);
+        } else if (comboBar.getAttribute("style") == "background-position: 100%") {
+            comboBar.setAttribute("style", "background-position: 98%");
+            greg.setAttribute("src", "./gifs/greg.gif");
+            mrSeal.setAttribute("src", "./gifs/mrSeal.gif");
+            crocImgDiv.classList.add("clickIP");
+        } else {
+            let currentBackPos = Number(comboBar.getAttribute("style").split(": ")[1].slice(0, -1));
+            comboBar.setAttribute("style", `background-position: ${currentBackPos - 2}%`);
+            crocImgDiv.classList.add("clickIP");
         }
     } else {
-        if (comboBar.getAttribute("class") != "") comboBar.setAttribute("class", comboClassArray[comboClassArray.indexOf(comboBar.getAttribute("class")) - 1]);
+        if (comboBar.classList.contains("full")) {
+            comboBar.classList.remove("full");
+            greg.classList.remove("rainbow-animation0");
+            mrSeal.classList.remove("rainbow-animation1");
+            comboBar.setAttribute("style", "background-position: 2%");
+            updateComboVar(0.5);
+        } else if (comboBar.getAttribute("style") == "background-position: 100%") {
+            greg.setAttribute("src", "./gifs/gregFREEZE.gif");
+            mrSeal.setAttribute("src", "./gifs/mrSealFREEZE.gif");
+        } else {
+            let currentBackPos = Number(comboBar.getAttribute("style").split(": ")[1].slice(0, -1));
+            comboBar.setAttribute("style", `background-position: ${currentBackPos + 2}%`);
+            crocImgDiv.classList.remove("clickIP");
+        }
     }
 }
-setInterval(updateCombo, 1000);
+setInterval(updateCombo, 100);
+
+function updateComboVar(factor) {
+    comboMult *= factor;
+    currentComboSpan.textContent = comboMult;
+}
 
 const crocImgArray = [
     "./images/backDirectR.png",
     "./images/bottomDirectR.png",
-    "./images/outsideDirectR.png",
-    "./images/topDirectR.png"
+    "./images/outsideDirectR.png"
 ]
 const crocImgDiv = document.querySelector("#croc-img-div");
 const crocImg = document.querySelector("#croc-img-div img");
@@ -93,7 +137,7 @@ crocImgDiv.addEventListener("click", (e) => {
     let currentSrc = crocImg.getAttribute("src");
     let newSrc = currentSrc;
     while (newSrc == currentSrc) {
-        newSrc = crocImgArray[Math.floor(Math.random()*4)];
+        newSrc = crocImgArray[Math.floor(Math.random()*3)];
     }
     crocImg.setAttribute("src", newSrc);
     makeCroc();

@@ -7,6 +7,12 @@
     display: none !important;
 }
 
+body {
+    display: flex;
+    flex-flow: row nowrap;
+
+}
+
 #factory-door {
     display: flex;
     flex-flow: column nowrap;
@@ -54,11 +60,64 @@
 #croc-img-div {
     width: 500px;
     height: 500px;
+    transition: background-color 0.3s ease-in-out, box-shadow 0.5s ease-in-out;
+    border-radius: 50%;
 }
 
 #croc-img-div img {
     width: 100%;
     height: 100%;
+    background-color: transparent;
+    border-radius: 50%;
+    object-fit: fill;
+    object-position: center;
+    transform: scale(1.2);
+    transition: transform 0.2s ease-in-out;
+}
+
+#croc-img-div img:hover {
+    transform: scale(1.4);
+}
+
+#croc-img-div:has(img:hover) {
+    background-color: lightblue;
+}
+
+.clickIP {
+    background-color: blue !important;
+}
+
+#factory-interface:has(+ #combo-div #combo-bar.full) #croc-img-div {
+    animation: rainbow-rotate2 3s linear infinite, shadowBounce 1s linear infinite, shadowPulse 0.3s ease-in-out infinite;
+}
+
+#factory-interface:has(+ #combo-div #combo-bar.full) #croc-img-div img {
+    animation: rainbow-rotate1 2s linear infinite;
+}
+
+@keyframes shadowBounce {
+    0% {
+        box-shadow: 0 0 0 40px gold;
+    }
+    50% {
+        box-shadow: 0 0 0 80px gold;
+        width: 550px;
+    }
+    100% {
+        box-shadow: 0 0 0 40px gold;
+    }
+}
+
+@keyframes shadowPulse {
+    0% {
+        transform: scale(1.1);
+    }
+    50% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1.1);
+    }
 }
 
 #combo-div {
@@ -71,53 +130,48 @@
 #combo-bar {
     flex-grow: 1;
     margin: 40px 5px 5px;
-    border: 2px solid black;
+    border: 4px solid black;
     border-radius: 25%;
     background-image: linear-gradient(to right, green 50%, white 50%);
     background-size: 200% 100%;
-    background-position: 100%;
-    transition: background-position 0.5s ease-in-out;
-}
-
-#combo-bar.one {
-    background-position: 90%;
-}
-
-#combo-bar.two {
-    background-position: 80%;
-}
-
-#combo-bar.three {
-    background-position: 70%;
-}
-
-#combo-bar.four {
-    background-position: 60%;
-}
-
-#combo-bar.five {
-    background-position: 50%;
-}
-
-#combo-bar.six {
-    background-position: 40%;
-}
-
-#combo-bar.seven {
-    background-position: 30%;
-}
-
-#combo-bar.eight {
-    background-position: 20%;
-}
-
-#combo-bar.nine {
-    background-position: 10%;
+    transition: background-position 0.1s linear;
 }
 
 #combo-bar.full {
     background-position: 0%;
     animation: rainbow-rotate0 2s linear infinite;
+}
+
+#combo-bar p {
+    position: relative;
+    top: -50px;
+    text-align: center;
+}
+
+#combo-bar.full p {
+    animation: pulsate 0.8s linear infinite;
+}
+
+@keyframes pulsate {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    25% {
+        transform: scale(1.6) rotate(4deg);
+    }
+
+    50% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    75% {
+        transform: scale(1.6) rotate(-4deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
 }
 
 .rainbow-animation0 {
@@ -158,11 +212,15 @@
 
 @keyframes rainbow-rotate2 {
     0% {
-        filter: hue-rotate(180deg);
+        filter: hue-rotate(240deg);
+    }
+
+    33% {
+        filter: hue-rotate(360deg);
     }
 
     100% {
-        filter: hue-rotate(180deg);
+        filter: hue-rotate(240deg);
     }
 }
 
