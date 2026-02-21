@@ -68,13 +68,27 @@ let crocBalance = getCookie("croc-balance") != false ? getCookie("croc-balance")
 let totalCrocs = getCookie("total-crocs") != false ? getCookie("total-crocs") : 0;
 let comboMult = 1;
 let clickHistory = [new Date()];
-function makeCroc() {
-    clickHistory.push(new Date());
-    if (clickHistory.length > 10) {
-        clickHistory.shift();
+function makeCroc(number = 1, source = "click", e) {
+    const particle = document.createElement("div");
+    particle.classList.add("particle");
+
+    if (source == "click") {
+        clickHistory.push(new Date());
+        if (clickHistory.length > 10) {
+            clickHistory.shift();
+        }
+        particle.style.left = `${e.clientX - 30 + window.scrollX}px`;
+        particle.style.top = `${e.clientY - 30 + window.scrollY}px`;
+    } else {
+        particle.style.left = `${e.getBoundingClientRect().left + window.scrollX + Math.floor(e.getBoundingClientRect().width * 0.5) - 10}px`;
+        particle.style.top = `${e.getBoundingClientRect().top + window.scrollY + Math.floor(e.getBoundingClientRect().height * 0.5)}px`;
     }
-    crocBalance = Number(crocBalance) + (1 * comboMult);
-    totalCrocs = Number(totalCrocs) + (1 * comboMult);
+    particle.textContent = "+" + (1 * comboMult * number);
+    particleDiv.appendChild(particle);
+    particle.addEventListener("animationend", () => particle.remove());
+    
+    crocBalance = Number(crocBalance) + (1 * comboMult * number);
+    totalCrocs = Number(totalCrocs) + (1 * comboMult * number);
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
     if (totalCrocs == 10) startEvent("mrSealIntro0");
@@ -83,6 +97,8 @@ function makeCroc() {
         startEvent("firstPurchase0");
     }
     //playSound("./audio/explosion.mp3");
+    
+    
 }
 
 const comboBar = document.querySelector("#combo-bar");
@@ -174,15 +190,7 @@ crocImgDiv.addEventListener("click", (e) => {
         newSrc = crocImgArray[Math.floor(Math.random()*3)];
     }
     crocImg.setAttribute("src", newSrc);
-    makeCroc();
-
-    const particle = document.createElement("div");
-    particle.classList.add("particle");
-    particle.style.left = String(e.clientX - 30) + "px";
-    particle.style.top = String(e.clientY - 50) + "px";
-    particle.textContent = "+" + (1 * comboMult);
-    particleDiv.appendChild(particle);
-    particle.addEventListener("animationend", () => particle.remove());
+    makeCroc(1, "click", e);
 })
 
 let eventArrays = {
@@ -266,7 +274,7 @@ shopItems.forEach((obj) => {
 const activeEntitiesDiv = document.querySelector("#active-entities-div");
 function purchaseItem(obj) {
     if (obj.price > crocBalance) {
-        console.log("cannot afford " + itemObj.name);
+        console.log("cannot afford " + obj.name);
     } else {
         crocBalance -= obj.price;
         populateFromCookies();
@@ -274,9 +282,22 @@ function purchaseItem(obj) {
         const entityImg = document.createElement("img");
         entityImg.setAttribute("src", obj.src);
         entityDiv.appendChild(entityImg);
-        activeEntitiesDiv.appendChild(entityDiv);
+        const entityTypeDiv = document.querySelector(`#${obj.name}s`);
+        entityTypeDiv.appendChild(entityDiv);
     }
 }
+
+const entityTypeDivs = document.querySelectorAll("#active-entities-div > div");
+function workersTick() {
+    entityTypeDivs.forEach((type) => {
+        const shopObj = shopItems.find(obj => obj.name == String(type.getAttribute("id")).slice(0, -1));
+        const childDivs = type.childNodes;
+        childDivs.forEach((child) => {
+            makeCroc(shopObj.stats, "entity", child);   
+        })
+    })
+}
+setInterval(workersTick, 1000);
 
 function populateFromCookies() {
     if (!getCookie("operator-name")) {

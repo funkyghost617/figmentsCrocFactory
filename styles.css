@@ -1,6 +1,7 @@
 * {
     box-sizing: border-box;
     font-family: "Comic Relief", Arial, sans-serif;
+    user-select: none;
 }
 
 .hidden {
@@ -89,11 +90,11 @@ body {
     background-color: blue !important;
 }
 
-#factory-interface:has(+ #combo-div #combo-bar.full) #croc-img-div {
+#factory-interface:has(+ #combo-column #combo-bar.full) #croc-img-div {
     animation: rainbow-rotate2 3s linear infinite, shadowBounce 1s linear infinite, shadowPulse 0.3s ease-in-out infinite;
 }
 
-#factory-interface:has(+ #combo-div #combo-bar.full) #croc-img-div img {
+#factory-interface:has(+ #combo-column #combo-bar.full) #croc-img-div img {
     animation: rainbow-rotate1 2s linear infinite;
 }
 
@@ -293,16 +294,17 @@ body {
     width: 10px;
     height: 10px;
     font-size: 3rem;
+    text-align: center;
     animation: particle-animation 2s ease-out forwards;
 }
 
 @keyframes particle-animation {
     0% {
-        transform: translate(-50%, 0), scale(1);
+        transform: translate(0, 0), scale(1);
         opacity: 1;
     }
     100% {
-        transform: translate(-50%, -100px) scale(0);
+        transform: translate(20px, -100px) scale(0);
         opacity: 0;
     }
 }
