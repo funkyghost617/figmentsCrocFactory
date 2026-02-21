@@ -46,8 +46,8 @@ factoryDoorBtn.addEventListener("click", (e) => {
         duration: 2500,
         iterations: 1
     });
-    
-    if (getCookie("tutorial-complete") != "true") {
+
+    if (getCookie("total-crocs") == "0") {
         setTimeout(() => startEvent("tutorial0"), 1200);
     }
     mainMusic = new Audio("./audio/housekeepingCaustic.mp3");
@@ -167,7 +167,7 @@ crocImgDiv.addEventListener("click", (e) => {
 })
 
 let eventArrays = {
-    "endEvent": [ setCookie("tutorial-complete", "true", 365) ],
+    "endEvent": [ true ],
     "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
     "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
     "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will lose my strength in this world forever", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
@@ -182,7 +182,7 @@ const eventBtn1 = document.querySelector("#event-modal button:nth-child(2)");
 const eventBtn2 = document.querySelector("#event-modal button:nth-child(3)");
 const eventBtn3 = document.querySelector("#event-modal button:nth-child(4)");
 function startEvent(eventName) {
-    if (eventName.contains("endEvent")) {
+    if (eventName.includes("endEvent")) {
         eventModal.close();
         eventArrays["endEvent"][Number(eventName.slice(8))];
         return;
