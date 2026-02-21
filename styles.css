@@ -77,6 +77,7 @@ body {
 
 #croc-img-div img:hover {
     transform: scale(1.4);
+    cursor: pointer;
 }
 
 #croc-img-div:has(img:hover) {
@@ -201,12 +202,8 @@ body {
         filter: hue-rotate(120deg);
     }
 
-    67% {
-        filter: hue-rotate(360deg);
-    }
-
     100% {
-        filter: hue-rotate(120deg);
+        filter: hue-rotate(480deg);
     }
 }
 
@@ -215,12 +212,8 @@ body {
         filter: hue-rotate(240deg);
     }
 
-    33% {
-        filter: hue-rotate(360deg);
-    }
-
     100% {
-        filter: hue-rotate(240deg);
+        filter: hue-rotate(600deg);
     }
 }
 

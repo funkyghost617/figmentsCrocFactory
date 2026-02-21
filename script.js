@@ -33,6 +33,9 @@ logAllBtn.addEventListener("click", (e) => {
     })
 });
 
+let mainMusic;
+let soundEffects = [];
+
 const factoryDoor = document.querySelector("#factory-door");
 const factoryDoorBtn = document.querySelector("#factory-door-btn");
 factoryDoorBtn.addEventListener("click", (e) => {
@@ -44,6 +47,11 @@ factoryDoorBtn.addEventListener("click", (e) => {
         duration: 2500,
         iterations: 1
     });
+
+    mainMusic = new Audio("./audio/housekeepingCaustic.mp3");
+    mainMusic.loop = true;
+    mainMusic.play();
+
     populateFromCookies();
     setTimeout(() => factoryDoor.classList.add("hidden"), 2000);
 })
@@ -59,11 +67,11 @@ function makeCroc() {
     if (clickHistory.length > 10) {
         clickHistory.shift();
     }
-    //updateCombo();
     crocBalance += 1 * comboMult;
     totalCrocs += 1 * comboMult;
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
+    //playSound("./audio/explosion.mp3");
 }
 
 const comboBar = document.querySelector("#combo-bar");
@@ -124,6 +132,19 @@ setInterval(updateCombo, 100);
 function updateComboVar(factor) {
     comboMult *= factor;
     currentComboSpan.textContent = comboMult;
+}
+
+// currently limits number of total active sound effects to 10
+function playSound(filepath) {
+    if (soundEffects.length > 9 && !soundEffects[0].paused) {
+        return;
+    }
+    let soundEffect = new Audio(filepath);
+    soundEffect.play();
+    soundEffects.push(soundEffect);
+    if (soundEffects.length > 9 && soundEffects[0].paused) {
+        soundEffects.shift();
+    }
 }
 
 const crocImgArray = [
