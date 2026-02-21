@@ -77,6 +77,11 @@ function makeCroc() {
     totalCrocs = Number(totalCrocs) + (1 * comboMult);
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
+    if (totalCrocs == 10) startEvent("mrSealIntro0");
+    if (totalCrocs == 100 || totalCrocs == 101) {
+        totalCrocs = 101;
+        startEvent("firstPurchase0");
+    }
     //playSound("./audio/explosion.mp3");
 }
 
@@ -134,6 +139,7 @@ function updateCombo() {
     }
 }
 setInterval(updateCombo, 100);
+greg.addEventListener
 
 function updateComboVar(factor) {
     comboMult *= factor;
@@ -160,6 +166,7 @@ const crocImgArray = [
 ]
 const crocImgDiv = document.querySelector("#croc-img-div");
 const crocImg = document.querySelector("#croc-img-div img");
+const particleDiv = document.querySelector("#particle-div");
 crocImgDiv.addEventListener("click", (e) => {
     let currentSrc = crocImg.getAttribute("src");
     let newSrc = currentSrc;
@@ -168,14 +175,29 @@ crocImgDiv.addEventListener("click", (e) => {
     }
     crocImg.setAttribute("src", newSrc);
     makeCroc();
+
+    const particle = document.createElement("div");
+    particle.classList.add("particle");
+    particle.style.left = String(e.clientX - 30) + "px";
+    particle.style.top = String(e.clientY - 50) + "px";
+    particle.textContent = "+" + (1 * comboMult);
+    particleDiv.appendChild(particle);
+    particle.addEventListener("animationend", () => particle.remove());
 })
 
 let eventArrays = {
     "endEvent": [ true ],
+    "fallbackEvent": ["ERROR", "no event found", "", "./images/figmentFullBody.png", "exit", "endEvent0", false, false, false, false],
     "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
     "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
     "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will lose my strength in this world forever.", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
     "tutorial3": ["Tutorial", "Anyways, let's get started!", "Just click on the croc to operate the factory.", "./images/figmentFullBody.png", "OKAY!", "endEvent0", false, false, false, false],
+    "mrSealIntro0": ["", "Hi there! I'm Mr. Seal.", "", "./gifs/mrSealFREEZE.gif", "--->", "mrSealIntro1", false, false, false, false],
+    "mrSealIntro1": ["", "This is my husband, Greg.", "", "./gifs/gregFREEZE.gif", "--->", "mrSealIntro2", false, false, false, false],
+    "mrSealIntro2": ["", "I'm here to tell you about the COMBO BAR.", "If you're clicking fast enough, you'll start filling up the combo bar in the top right.", "./gifs/mrSealFREEZE.gif", "--->", "mrSealIntro3", false, false, false, false],
+    "mrSealIntro3": ["", "If you keep clicking fast enough for enough time, Greg and I will start dancing!", "Eventually, we'll also be able to use the power of the COMBO BAR to augment your factory's output. Try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
+    "firstPurchase0": ["", "It looks like you have enough crocs to pay someone to help you!", "It's important that we manufacture crocs for the general public, but we can also melt them down and use the resulting goop as payment for our employees.", "./images/figmentFullBody.png", "--->", "firstPurchase1", false, false, false, false],
+    "firstPurchase1": ["", "Your employees' output will also be affected by me and Greg's COMBO BAR.", "Hire a skeleton and try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
 };
 const eventModal = document.querySelector("#event-modal");
 const eventTitle = document.querySelector("#event-modal h2");
@@ -199,14 +221,61 @@ function startEvent(eventName) {
     eventBtn1.textContent = eventArray[4];
     eventBtn1.addEventListener("click", (e) => startEvent(eventArray[5]));
     if (eventArray[6] != false) {
+        eventBtn2.hidden = false;
         eventBtn2.textContent = eventArray[6];
         eventBtn2.addEventListener("click", (e) => startEvent(eventArray[7]));
     } else eventBtn2.hidden = true;
     if (eventArray[8] != false) {
+        eventBtn3.hidden = false;
         eventBtn3.textContent = eventArray[8];
         eventBtn3.addEventListener("click", (e) => startEvent(eventArray[9]));
     } else eventBtn3.hidden = true;
     eventModal.showModal();
+}
+
+let shopItems = [
+    { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 100, stats: 5 },
+    { name: "nubby", src: "./gifs/nubby.gif", price: 1000, stats: 10 }
+];
+
+const shopDiv = document.querySelector("#shop-div");
+shopItems.forEach((obj) => {
+    const itemInfo = document.createElement("div");
+    itemInfo.classList.add("purchase-info");
+    const itemImg = document.createElement("img");
+    itemImg.setAttribute("src", obj.src);
+    itemInfo.appendChild(itemImg);
+    const itemDesc = document.createElement("p");
+    itemDesc.textContent = obj.name;
+    itemInfo.appendChild(itemDesc);
+    const itemStats = document.createElement("p");
+    itemStats.textContent = obj.stats + " crocs/sec";
+    itemInfo.appendChild(itemStats);
+    shopDiv.appendChild(itemInfo);
+    const buyBtn = document.createElement("div");
+    buyBtn.classList.add("purchase-btn");
+    const itemPrice = document.createElement("p");
+    itemPrice.textContent = obj.price + " crocs";
+    buyBtn.appendChild(itemPrice);
+    buyBtn.addEventListener("click", (e) => {
+        purchaseItem(obj);
+    })
+    shopDiv.appendChild(buyBtn);
+})
+
+const activeEntitiesDiv = document.querySelector("#active-entities-div");
+function purchaseItem(obj) {
+    if (obj.price > crocBalance) {
+        console.log("cannot afford " + itemObj.name);
+    } else {
+        crocBalance -= obj.price;
+        populateFromCookies();
+        const entityDiv = document.createElement("div");
+        const entityImg = document.createElement("img");
+        entityImg.setAttribute("src", obj.src);
+        entityDiv.appendChild(entityImg);
+        activeEntitiesDiv.appendChild(entityDiv);
+    }
 }
 
 function populateFromCookies() {
