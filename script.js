@@ -25,11 +25,11 @@ clearDataBtn.addEventListener("click", (e) => {
 const logAllBtn = document.querySelector("#log-all-btn");
 logAllBtn.addEventListener("click", (e) => {
     console.log(document.cookie);
-    cookieStore.getAll().then(cookies => {
+    /*cookieStore.getAll().then(cookies => {
         cookies.forEach(cookie => {
             console.log(cookie);
         })
-    })
+    })*/
 });
 const reloadPageBtn = document.querySelector("#reload-page-btn");
 reloadPageBtn.addEventListener("click", (e) => {
@@ -59,6 +59,8 @@ factoryDoorBtn.addEventListener("click", (e) => {
     mainMusic.play();
 
     populateFromCookies();
+    loadSavedEntities();
+    loadSavedPerks();
     setTimeout(() => factoryDoor.classList.add("hidden"), 2000);
 })
 
@@ -85,12 +87,12 @@ function makeCroc(number = 1, source = "click", e) {
         particle.style.left = `${e.getBoundingClientRect().left + window.scrollX + Math.floor(e.getBoundingClientRect().width * 0.5) - 10}px`;
         particle.style.top = `${e.getBoundingClientRect().top + window.scrollY + Math.floor(e.getBoundingClientRect().height * 0.5)}px`;
     }
-    particle.textContent = "+" + (1 * comboMult * number);
+    particle.textContent = "+" + Math.floor(1 * comboMult * number);
     particleDiv.appendChild(particle);
     particle.addEventListener("animationend", () => particle.remove());
     
-    crocBalance = Number(crocBalance) + (1 * comboMult * number);
-    totalCrocs = Number(totalCrocs) + (1 * comboMult * number);
+    crocBalance = Number(crocBalance) + Math.floor(1 * comboMult * number);
+    totalCrocs = Number(totalCrocs) + Math.floor(1 * comboMult * number);
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
     currentOutputSpans.forEach(span => span.textContent = currentOutput);
@@ -198,19 +200,64 @@ crocImgDiv.addEventListener("click", (e) => {
     makeCroc(1, "click", e);
 })
 
+let graveyardPerkThreshhold = 20;
+let perksLibrary = [
+    { id: "graveyardPerk", name: "Graveyard's Blessing", src: "./gifs/graveyardDance.gif", comboEffect: 1.5, desc: "x1.5 combo" }
+]
+const perksDiv = document.querySelector("#perks");
+function addPerk(perkID) {
+    let perkObj = perksLibrary.find(item => item.id == perkID);
+    makePerkDiv(perkObj);
+    let perkIndex = 0;
+    let cookieCheck = getCookie(`${perkObj.id}-${perkIndex}`);
+    while (cookieCheck != false) {
+        perkIndex++;
+        cookieCheck = getCookie(`${perkObj.id}-${perkIndex}`);
+    }
+    setCookie(`${perkObj.id}-${perkIndex}`, "true", 365);
+    updateComboVar(perkObj.comboEffect);
+}
+
+function makePerkDiv(obj) {
+    const perkDiv = document.createElement("div");
+    const perkImg = document.createElement("img");
+    perkImg.setAttribute("src", obj.src);
+    const perkPara = document.createElement("p");
+    perkPara.textContent = obj.name;
+    const perkDesc = document.createElement("p");
+    perkDesc.textContent = obj.desc;
+    perkDiv.append(perkImg, perkPara, perkDesc);
+    perksDiv.appendChild(perkDiv);
+    updateComboVar(obj.comboEffect);
+}
+
+function loadSavedPerks() {
+    perksLibrary.forEach((perkObj) => {
+        let perkIndex = 0;
+        let cookieCheck = getCookie(`${perkObj.id}-${perkIndex}`);
+        while (cookieCheck == "true") {
+            makePerkDiv(perkObj);
+            perkIndex++;
+            cookieCheck = getCookie(`${perkObj.id}-${perkIndex}`);
+        }
+    })
+}
+
 let eventArrays = {
-    "endEvent": [ true ],
+    "endEvent": [ () => true, (perkID) => addPerk(perkID) ],
     "fallbackEvent": ["ERROR", "no event found", "", "./images/figmentFullBody.png", "exit", "endEvent0", false, false, false, false],
     "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
-    "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
-    "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will be banished to the abyss of forgotten theme park mascots, never to take corporeal form ever again.", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
-    "tutorial3": ["Tutorial", "Anyways, let's get started!", "Just click on the croc to operate the factory.", "./images/figmentFullBody.png", "OKAY!", "endEvent0", false, false, false, false],
+        "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
+        "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will be banished to the abyss of forgotten theme park mascots, never to take corporeal form ever again.", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
+        "tutorial3": ["Tutorial", "Anyways, let's get started!", "Just click on the croc to operate the factory.", "./images/figmentFullBody.png", "OKAY!", "endEvent0", false, false, false, false],
     "mrSealIntro0": ["", "Hi there! I'm Mr. Seal.", "", "./gifs/mrSealFREEZE.gif", "--->", "mrSealIntro1", false, false, false, false],
-    "mrSealIntro1": ["", "This is my husband, Greg.", "", "./gifs/gregFREEZE.gif", "--->", "mrSealIntro2", false, false, false, false],
-    "mrSealIntro2": ["", "I'm here to tell you about the COMBO BAR.", "If you're clicking fast enough, you'll start filling up the combo bar in the top right.", "./gifs/mrSealFREEZE.gif", "--->", "mrSealIntro3", false, false, false, false],
-    "mrSealIntro3": ["", "If you keep clicking fast enough for enough time, Greg and I will start dancing!", "Eventually, we'll also be able to use the power of the COMBO BAR to augment your factory's output. Try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
-    "firstPurchase0": ["", "It looks like you have enough crocs to pay someone to help you!", "It's important that we manufacture crocs for the general public, but we can also melt them down and use the resulting goop as payment for our employees.", "./images/figmentFullBody.png", "--->", "firstPurchase1", false, false, false, false],
-    "firstPurchase1": ["", "Your employees' output will also be affected by me and Greg's COMBO BAR.", "Hire a skeleton and try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
+        "mrSealIntro1": ["", "This is my husband, Greg.", "", "./gifs/gregFREEZE.gif", "--->", "mrSealIntro2", false, false, false, false],
+        "mrSealIntro2": ["", "I'm here to tell you about the COMBO BAR.", "If you're clicking fast enough, you'll start filling up the combo bar in the top right.", "./gifs/mrSealFREEZE.gif", "--->", "mrSealIntro3", false, false, false, false],
+        "mrSealIntro3": ["", "If you keep clicking fast enough for enough time, Greg and I will start dancing!", "Eventually, we'll also be able to use the power of the COMBO BAR to augment your factory's output. Try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
+    "firstPurchase0": ["", "It looks like you have enough crocs to pay someone to help you!", "It's important that we manufacture crocs for the general public, but we can also melt some of them down and use the resulting carcinogenic goop as payment for our employees.", "./images/figmentFullBody.png", "--->", "firstPurchase1", false, false, false, false],
+        "firstPurchase1": ["", "Your employees' output will also be affected by me and Greg's COMBO BAR.", "Hire a skeleton and try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
+    "perkGraveyard0": ["Calcium-based employees LOVE you!!!", `You've employed ${graveyardPerkThreshhold} skeletons. Groovy!`, "This has emboldened your skeletons to form a union. Awesome!", "./gifs/dance-skeleton.gif", "--->", "perkGraveyard1", false, false, false, false],
+        "perkGraveyard1": ["Calcium-based employees LOVE you!!!", "Being in a union has greatly improved your skeletons' quality of life, which has in turn increased their output at the factory!", `You have received the ${perksLibrary.find(item => item.id == "graveyardPerk").name}.`, "./gifs/graveyardDance.gif", "OKAY!", "endEvent1graveyardPerk", false, false, false, false],
 };
 const eventModal = document.querySelector("#event-modal");
 const eventTitle = document.querySelector("#event-modal h2");
@@ -223,7 +270,7 @@ const eventBtn3 = document.querySelector("#event-modal button:nth-child(4)");
 function startEvent(eventName) {
     if (eventName.includes("endEvent")) {
         eventModal.close();
-        eventArrays["endEvent"][Number(eventName.slice(8))];
+        eventArrays["endEvent"][Number(eventName.charAt(8))](eventName.slice(9));
         return;
     }
     const eventArray = eventArrays[eventName];
@@ -250,12 +297,12 @@ let shopItems = [
     { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 100, stats: 5 },
     { name: "nubby", src: "./gifs/nubby.gif", price: 1000, stats: 10 },
     { name: "rubber-chicken", src: "./gifs/rubberChicken.gif", price: 5000, stats: 20 },
-    { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 10000, stats: 50 },
-    { name: "turtle", src: "./gifs/turtle.gif", price: 15000, stats: 75 },
-    { name: "mutant-nubby", src: "./gifs/mutantNubby.gif", price: 25000, stats: 100 },
-    { name: "punch", src: "./gifs/punch.gif", price: 50000, stats: 250 },
-    { name: "pingu", src: "./gifs/pingu.gif", price: 100000, stats: 500 },
-    { name: "ego-death", src: "./gifs/pedro-pascal.gif", price: Math.pow(10, 100), stats: 69 }
+    { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 50000, stats: 50 },
+    { name: "turtle", src: "./gifs/turtle.gif", price: 100000, stats: 75 },
+    { name: "mutant-nubby", src: "./gifs/mutantNubby.gif", price: 500000, stats: 100 },
+    { name: "punch", src: "./gifs/punch.gif", price: 1000000, stats: 250 },
+    { name: "pingu", src: "./gifs/pingu.gif", price: 20000000, stats: 500 },
+    { name: "ego-death", src: "./gifs/pedro-pascal.gif", price: Math.pow(10, 100), stats: 67 }
 ];
 
 const shopDiv = document.querySelector("#shop-div");
@@ -294,6 +341,10 @@ function purchaseItem(obj) {
         makeEntityDiv(obj);
         updateEmployedEntities();
         updateCookies();
+        updateShopBtns();
+        if (obj.name == "skeleton" && getCookie("skeletons-employed") == graveyardPerkThreshhold) {
+            startEvent("perkGraveyard0");
+        }
     }
 }
 
@@ -343,7 +394,6 @@ function loadSavedEntities() {
         }
     })
 }
-loadSavedEntities();
 
 let currentOutputBenchmark = totalCrocs;
 function currentOutputTick() {

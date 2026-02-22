@@ -75,7 +75,7 @@ body {
     }
 }
 
-#augmentations {
+#perks {
     height: 300px;
     display: flex;
     flex-flow: column nowrap;
