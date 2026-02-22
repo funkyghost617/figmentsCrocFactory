@@ -14,9 +14,19 @@
             <h1>Figment's Croc Factory</h1>
             <button id="factory-door-btn">Clock in!</button>
         </div>
-
+        
+        <div id="particle-div"></div>
         <div id="factory-interface">
-            <div id="stats"></div>
+            <div id="stats">
+                <div id="operator-name-cont">
+                    <p><span class="operator-name"></span> the Operator</p>
+                    <p>Current output: <span class="current-croc-output"></span> crocs/sec</p>
+                </div>
+                <div id="you-div">
+                    <img id="you" src="./gifs/you.gif" />
+                </div>
+                <div id="augmentations"></div>
+            </div>
             <div id="factory-heart">
                 <div id="counter-div">
                     <p id="current-croc-balance">Current croc balance: <span class="current-croc-balance"></span></p>
@@ -43,11 +53,16 @@
             <div id="shop-div"></div>
         </div>
         <br />
-        <div id="active-entities-div">
-            <div id="skeletons"></div>
-            <div id="nubbys"></div>
+        <div id="active-entities-scroll-div">
+            <div id="active-entities-div">
+                <div id="skeletons"></div>
+                <div id="nubbys"></div>
+                <div id="rubber-chickens"></div>
+                <div id="unicycle-frogs"></div>
+                <div id="turtles"></div>
+                <div id="mutant-nubbys"></div>
+            </div>
         </div>
-
         <div id="info-div">
             <div>
                 <div id="info-toggle" class="hidden">
@@ -80,7 +95,6 @@
                 </div>
             </div>
         </dialog>
-        <div id="particle-div"></div>
 
         <script src="./script.js"></script>
     </body>

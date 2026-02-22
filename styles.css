@@ -31,7 +31,7 @@ body {
 
 #factory-interface {
     width: 900px;
-    height: 800px;
+    height: 700px;
     border: 2px solid black;
     display: flex;
 }
@@ -39,6 +39,48 @@ body {
 #stats {
     width: 30%;
     height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+#stats > * {
+    width: 100%;
+}
+
+#operator-name-cont {
+    height: 100px;
+    border: 2px solid black;
+    background-color: lightgreen;
+}
+
+#you-div {
+    height: 300px;
+    display: flex;
+    background-color: red;
+    animation: background-rainbow 10s linear infinite;
+}
+
+#you-div img {
+    width: 100%;
+    height: 100%;
+    opacity: 0.7;
+}
+
+@keyframes background-rainbow {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+#augmentations {
+    height: 300px;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-y: scroll;
+    scrollbar-width: none;
 }
 
 #factory-heart {
@@ -53,9 +95,18 @@ body {
 #counter-div {
     display: flex;
     width: 50%;
-    margin-left: 20%;
+    margin-left: 10%;
     flex-flow: column nowrap;
     align-items: flex-start;
+    justify-content: flex-start;
+}
+
+#counter-div > p:first-child {
+    margin-top: -10px;
+}
+
+#counter-div > p:first-child span {
+    font-size: 2.5rem;
 }
 
 #croc-img-div {
@@ -295,7 +346,29 @@ body {
     height: 10px;
     font-size: 3rem;
     text-align: center;
+    color: red;
+    text-shadow: 2px 5px black;
     animation: particle-animation 2s ease-out forwards;
+}
+
+#particle-div:has(~ #combo-column #combo-bar.full) {
+    animation: rainbow-rotate0 1s linear infinite;
+}
+
+.combo-particle {
+    display: none;
+    font-size: 2rem !important;
+}
+
+#particle-div:has(~ #combo-column #combo-bar.full) .combo-particle {
+    display: block;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    font-size: 3rem;
+    text-align: center;
+    color: red;
+    text-shadow: 2px 5px black;
 }
 
 @keyframes particle-animation {
@@ -311,7 +384,9 @@ body {
 
 #combo-column {
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: column nowrap;
+    height: 700px;
+    border: 2px solid black;
 }
 
 #shop-sign {
@@ -325,6 +400,14 @@ body {
     justify-content: center;
     align-items: center;
     font-size: 4rem;
+    position: relative;
+}
+
+#shop-sign::before {
+    content: "scroll down for more available employees";
+    position: absolute;
+    font-size: 1rem;
+    bottom: 0;
 }
 
 #shop-div {
@@ -333,6 +416,8 @@ body {
     width: 500px;
     border-left: 4px solid black;
     border-right: 6px solid black;
+    overflow-y: scroll;
+    scrollbar-width: none;
 }
 
 .purchase-info {
@@ -353,6 +438,56 @@ body {
     align-items: center;
 }
 
+.purchase-btn:hover {
+    background-color: lightgreen;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#active-entities-scroll-div {
+    overflow-x: scroll;
+    transform: rotate(180deg);
+    width: 1500px;
+    direction: rtl;
+}
+
 #active-entities-div {
     display: flex;
+    flex-flow: row-reverse nowrap;
+    
+    transform: rotate(180deg);
+    border: 2px solid red;
+    width: 1500px;
+}
+
+#active-entities-div img {
+    width: 200px;
+    height: 200px;
+}
+
+.too-expensive {
+    background-color: red !important;
+}
+
+.too-expensive:hover {
+    background-color: darkred !important;
+    cursor: default !important;
+    position: relative;
+}
+
+.too-expensive:hover::before,
+.too-expensive:hover::after {
+    content: "";
+    position: absolute;
+    width: 80%;
+    height: 4px;
+    background-color: white;
+}
+
+.too-expensive:hover::before {
+    transform: rotate(45deg);
+}
+
+.too-expensive:hover::after {
+    transform: rotate(-45deg);
 }

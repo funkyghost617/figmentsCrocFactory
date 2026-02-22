@@ -63,9 +63,11 @@ factoryDoorBtn.addEventListener("click", (e) => {
 })
 
 const crocBalanceSpans = document.querySelectorAll(".current-croc-balance");
-const totalCrocsSpans = document.querySelectorAll(".total-croc-count")
+const totalCrocsSpans = document.querySelectorAll(".total-croc-count");
+const currentOutputSpans = document.querySelectorAll(".current-croc-output");
 let crocBalance = getCookie("croc-balance") != false ? getCookie("croc-balance") : 0;
 let totalCrocs = getCookie("total-crocs") != false ? getCookie("total-crocs") : 0;
+let currentOutput = 0;
 let comboMult = 1;
 let clickHistory = [new Date()];
 function makeCroc(number = 1, source = "click", e) {
@@ -78,7 +80,7 @@ function makeCroc(number = 1, source = "click", e) {
             clickHistory.shift();
         }
         particle.style.left = `${e.clientX - 30 + window.scrollX}px`;
-        particle.style.top = `${e.clientY - 30 + window.scrollY}px`;
+        particle.style.top = `${e.clientY - 50 + window.scrollY}px`;
     } else {
         particle.style.left = `${e.getBoundingClientRect().left + window.scrollX + Math.floor(e.getBoundingClientRect().width * 0.5) - 10}px`;
         particle.style.top = `${e.getBoundingClientRect().top + window.scrollY + Math.floor(e.getBoundingClientRect().height * 0.5)}px`;
@@ -91,11 +93,13 @@ function makeCroc(number = 1, source = "click", e) {
     totalCrocs = Number(totalCrocs) + (1 * comboMult * number);
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
+    currentOutputSpans.forEach(span => span.textContent = currentOutput);
     if (totalCrocs == 10) startEvent("mrSealIntro0");
     if (totalCrocs == 100 || totalCrocs == 101) {
         totalCrocs = 101;
         startEvent("firstPurchase0");
     }
+    updateShopBtns();
     //playSound("./audio/explosion.mp3");
     
     
@@ -127,6 +131,7 @@ function updateCombo() {
             mrSeal.classList.add("rainbow-animation1");
             comboBar.removeAttribute("style");
             updateComboVar(2);
+            playSound("./audio/marioKartLap.mp3");
         } else if (comboBar.getAttribute("style") == "background-position: 100%") {
             comboBar.setAttribute("style", "background-position: 98%");
             greg.setAttribute("src", "./gifs/greg.gif");
@@ -198,7 +203,7 @@ let eventArrays = {
     "fallbackEvent": ["ERROR", "no event found", "", "./images/figmentFullBody.png", "exit", "endEvent0", false, false, false, false],
     "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
     "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
-    "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will lose my strength in this world forever.", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
+    "tutorial2": ["👎︎☜︎✌︎❄︎☟︎ ✌︎🕈︎✌︎✋︎❄︎💧︎", "... i will be banished to the abyss of forgotten theme park mascots, never to take corporeal form ever again.", "", "./images/figmentCursed.png", "--->", "tutorial3", false, false, false, false],
     "tutorial3": ["Tutorial", "Anyways, let's get started!", "Just click on the croc to operate the factory.", "./images/figmentFullBody.png", "OKAY!", "endEvent0", false, false, false, false],
     "mrSealIntro0": ["", "Hi there! I'm Mr. Seal.", "", "./gifs/mrSealFREEZE.gif", "--->", "mrSealIntro1", false, false, false, false],
     "mrSealIntro1": ["", "This is my husband, Greg.", "", "./gifs/gregFREEZE.gif", "--->", "mrSealIntro2", false, false, false, false],
@@ -243,7 +248,14 @@ function startEvent(eventName) {
 
 let shopItems = [
     { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 100, stats: 5 },
-    { name: "nubby", src: "./gifs/nubby.gif", price: 1000, stats: 10 }
+    { name: "nubby", src: "./gifs/nubby.gif", price: 1000, stats: 10 },
+    { name: "rubber-chicken", src: "./gifs/rubberChicken.gif", price: 5000, stats: 20 },
+    { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 10000, stats: 50 },
+    { name: "turtle", src: "./gifs/turtle.gif", price: 15000, stats: 75 },
+    { name: "mutant-nubby", src: "./gifs/mutantNubby.gif", price: 25000, stats: 100 },
+    { name: "punch", src: "./gifs/punch.gif", price: 50000, stats: 250 },
+    { name: "pingu", src: "./gifs/pingu.gif", price: 100000, stats: 500 },
+    { name: "ego-death", src: "./gifs/pedro-pascal.gif", price: Math.pow(10, 100), stats: 69 }
 ];
 
 const shopDiv = document.querySelector("#shop-div");
@@ -262,6 +274,7 @@ shopItems.forEach((obj) => {
     shopDiv.appendChild(itemInfo);
     const buyBtn = document.createElement("div");
     buyBtn.classList.add("purchase-btn");
+    buyBtn.setAttribute("id", obj.name + "-buy-btn");
     const itemPrice = document.createElement("p");
     itemPrice.textContent = obj.price + " crocs";
     buyBtn.appendChild(itemPrice);
@@ -278,13 +291,31 @@ function purchaseItem(obj) {
     } else {
         crocBalance -= obj.price;
         populateFromCookies();
-        const entityDiv = document.createElement("div");
-        const entityImg = document.createElement("img");
-        entityImg.setAttribute("src", obj.src);
-        entityDiv.appendChild(entityImg);
-        const entityTypeDiv = document.querySelector(`#${obj.name}s`);
-        entityTypeDiv.appendChild(entityDiv);
+        makeEntityDiv(obj);
+        updateEmployedEntities();
+        updateCookies();
     }
+}
+
+function updateShopBtns() {
+    shopItems.forEach((obj) => {
+        const relevantBtn = document.querySelector(`#${obj.name}-buy-btn`);
+        if (obj.price > crocBalance) {
+            relevantBtn.classList.add("too-expensive");
+        } else {
+            relevantBtn.classList.remove("too-expensive");
+        }
+    })
+}
+updateShopBtns();
+
+function makeEntityDiv(obj) {
+    const entityDiv = document.createElement("div");
+    const entityImg = document.createElement("img");
+    entityImg.setAttribute("src", obj.src);
+    entityDiv.appendChild(entityImg);
+    const entityTypeDiv = document.querySelector(`#${obj.name}s`);
+    entityTypeDiv.appendChild(entityDiv);
 }
 
 const entityTypeDivs = document.querySelectorAll("#active-entities-div > div");
@@ -299,6 +330,29 @@ function workersTick() {
 }
 setInterval(workersTick, 1000);
 
+function updateEmployedEntities() {
+    entityTypeDivs.forEach((type) => {
+        setCookie(`${type.id}-employed`, type.childNodes.length, 365);
+    })
+}
+
+function loadSavedEntities() {
+    entityTypeDivs.forEach((type) => {
+        for (let i = 0; i < Number(getCookie(`${type.id}-employed`)); i++) {
+            makeEntityDiv(shopItems.find(item => item.name == type.id.slice(0, -1)));
+        }
+    })
+}
+loadSavedEntities();
+
+let currentOutputBenchmark = totalCrocs;
+function currentOutputTick() {
+    currentOutput = totalCrocs - currentOutputBenchmark;
+    currentOutputBenchmark = totalCrocs;
+    currentOutputSpans.forEach(span => span.textContent = currentOutput);
+}
+setInterval(currentOutputTick, 1000);
+
 function populateFromCookies() {
     if (!getCookie("operator-name")) {
         let newName = "";
@@ -310,12 +364,13 @@ function populateFromCookies() {
     operatorNameSpans.forEach(span => { span.textContent = getCookie("operator-name") });
     crocBalanceSpans.forEach(span => span.textContent = crocBalance);
     totalCrocsSpans.forEach(span => span.textContent = totalCrocs);
+    currentOutputSpans.forEach(span => span.textContent = currentOutput);
 }
 populateFromCookies();
 
 function updateCookies() {
     setCookie("croc-balance", crocBalance, 365);
-    setCookie("total-crocs", totalCrocs, 365)
+    setCookie("total-crocs", totalCrocs, 365);
 }
 setInterval(updateCookies, 10000);
 
@@ -354,4 +409,22 @@ function deleteAllCookies() {
         })
     })
 }
-//deleteAllCookies();
+
+function createComboParticles() {
+    const particle = document.createElement("div");
+    particle.classList.add("combo-particle");
+    particle.style.left = `${1040 - window.scrollX}px`;
+    particle.style.top = `${50 - window.scrollY}px`;
+    particle.textContent = "COMBOOOOOO";
+    particleDiv.appendChild(particle);
+    particle.animate([
+        { transform: "translate(0)", opacity: "1" },
+        { transform: `translate(${Math.random() > 0.5 ? "" : "-"}${Math.floor(Math.random() * 100) + 50}px, ${Math.random() > 0.5 ? "" : "-"}${Math.floor(Math.random() * 100) + 50}px)`, opacity: "0" }
+    ], {
+        duration: 500,
+        iterations: 1
+    });
+    setTimeout(() => particle.remove(), 500);
+}
+setInterval(createComboParticles, 100);
+
