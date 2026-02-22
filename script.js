@@ -216,6 +216,7 @@ function addPerk(perkID) {
     }
     setCookie(`${perkObj.id}-${perkIndex}`, "true", 365);
     updateComboVar(perkObj.comboEffect);
+    playSound("./audio/getNewSpecialItem.wav");
 }
 
 function makePerkDiv(obj) {
@@ -404,7 +405,7 @@ function currentOutputTick() {
 setInterval(currentOutputTick, 1000);
 
 function populateFromCookies() {
-    if (!getCookie("operator-name")) {
+    if (!getCookie("operator-name") || getCookie("operator-name") == "null") {
         let newName = "";
         while (newName == "" ) {
             newName = prompt("Please enter your name (this can be changed at any time)", "");
