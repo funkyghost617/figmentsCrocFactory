@@ -39,7 +39,7 @@ reloadPageBtn.addEventListener("click", (e) => {
 let mainMusic;
 let soundEffects = [];
 let declinedDemon = getCookie("declined-demon") == "true" ? true : false;
-setCookie("version", "1.0");
+setCookie("version", "1.0", 365);
 
 const factoryDoor = document.querySelector("#factory-door");
 const factoryDoorBtn = document.querySelector("#factory-door-btn");
@@ -295,7 +295,7 @@ function triggerRandomEvent() {
 setInterval(triggerRandomEvent, 1000 * 60 * 2);
 
 let eventArrays = {
-    "endEvent": [ () => true, (perkID) => addPerk(perkID), (cookieName) => setCookie(cookieName, "true") ],
+    "endEvent": [ () => true, (perkID) => addPerk(perkID), (cookieName) => setCookie(cookieName, "true", 365) ],
     "fallbackEvent": ["ERROR", "no event found", "", "./images/figmentFullBody.png", "exit", "endEvent0", false, false, false, false],
     "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
         "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
@@ -347,6 +347,12 @@ function startEvent(eventName) {
     if (eventName.includes("endEvent")) {
         eventModal.close();
         eventArrays["endEvent"][Number(eventName.charAt(8))](eventName.slice(9));
+        if (eventName.slice(9) == "demonPerk") {
+            for (let i = 0; i < 5; i++) {
+                crocBalance += shopItems.find(item => item.name == "mutant-nubby").price;
+                purchaseItem(shopItems.find(item => item.name == "mutant-nubby"));
+            }
+        }
         return;
     }
     const eventArray = eventArrays[eventName];
