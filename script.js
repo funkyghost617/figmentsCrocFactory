@@ -38,6 +38,8 @@ reloadPageBtn.addEventListener("click", (e) => {
 
 let mainMusic;
 let soundEffects = [];
+let declinedDemon = getCookie("declined-demon") == "true" ? true : false;
+setCookie("version", "1.0");
 
 const factoryDoor = document.querySelector("#factory-door");
 const factoryDoorBtn = document.querySelector("#factory-door-btn");
@@ -109,7 +111,7 @@ function makeCroc(number = 1, source = "click", e) {
 
 const comboBar = document.querySelector("#combo-bar");
 const currentComboSpan = document.querySelector("#current-combo");
-currentComboSpan.textContent = comboMult;
+currentComboSpan.textContent = truncateToTwoDecimals(comboMult);
 const greg = document.querySelector("#greg");
 const mrSeal = document.querySelector("#mr-seal");
 function updateCombo() {
@@ -166,7 +168,7 @@ greg.addEventListener
 
 function updateComboVar(factor) {
     comboMult *= factor;
-    currentComboSpan.textContent = comboMult;
+    currentComboSpan.textContent = truncateToTwoDecimals(comboMult);
 }
 
 // currently limits number of total active sound effects to 10
@@ -200,9 +202,24 @@ crocImgDiv.addEventListener("click", (e) => {
     makeCroc(1, "click", e);
 })
 
-let graveyardPerkThreshhold = 20;
+let graveyardPerkThresh = 20;
+let punchPerkThresh = 2;
+let egoDeathPerkThresh = 1;
+let randomPerkEvents = ["perkNye0", "perkFrench0", "perkRobert0", "perkGirl0", "perkJordan0"];
 let perksLibrary = [
-    { id: "graveyardPerk", name: "Graveyard's Blessing", src: "./gifs/graveyardDance.gif", comboEffect: 1.5, desc: "x1.5 combo" }
+    { id: "graveyardPerk", name: "Graveyard's Blessing", src: "./gifs/graveyardDance.gif", comboEffect: 1.5, desc: "x1.5 combo" },
+    { id: "punchPerk", name: "Punch's Power of Friendship", src: "./images/punchAndFriend.png", comboEffect: 2, desc: "x2 combo" },
+    { id: "egoDeathPerk", name: "ego death", src: "./gifs/pedroSmile.gif", comboEffect: 67, desc: "x67 combo" },
+
+    { id: "nyePerk", name: "SCIENCE RULES", src: "./gifs/billNyeHead.gif", comboEffect: 1.8, desc: "x1.8 combo" },
+    { id: "frenchPerk", name: "Macron's Love", src: "./images/macron.jpg", comboEffect: 1.2, desc: "x1.2 combo" },
+    { id: "robertPerk", name: "Edward's Kiss", src: "./images/robMog.jpg", comboEffect: 1.3, desc: "x1.3 combo" },
+    { id: "girlPerk", name: "Self-assurance", src: "./images/girlNoText.jpg", comboEffect: 1.4, desc: "x1.4 combo" },
+    //{},
+    { id: "jordanPerk", name: "Bankruptcy of the Soul", src: "./images/jordan.jpeg", comboEffect: 0.8, desc: "x0.8 combo" },
+
+    { id: "demonPerk", name: "Mark of Cain", src: "./images/davidTennantMog.png", comboEffect: 0.9, desc: "x0.9 combo" },
+    { id: "angelPerk", name: "Favor of the Triumvarate", src: "/gifs/isaac.gif", comboEffect: 3, desc: "x3 combo" }
 ]
 const perksDiv = document.querySelector("#perks");
 function addPerk(perkID) {
@@ -228,7 +245,15 @@ function makePerkDiv(obj) {
     const perkDesc = document.createElement("p");
     perkDesc.textContent = obj.desc;
     perkDiv.append(perkImg, perkPara, perkDesc);
-    perksDiv.appendChild(perkDiv);
+    perksDiv.prepend(perkDiv);
+    if (obj.comboEffect < 1) {
+        perkDiv.classList.add("negative");
+    } else {
+        perkDiv.classList.add("positive");
+        let duration = Math.floor(Math.random()*3) + 2;
+        perkDiv.setAttribute("style", `animation-duration: ${duration}s`);
+        perkImg.setAttribute("style", `animation-duration: ${duration}s`);
+    }
     updateComboVar(obj.comboEffect);
 }
 
@@ -244,8 +269,33 @@ function loadSavedPerks() {
     })
 }
 
+function triggerRandomEvent() {
+    if (eventModal.open) {
+        console.log("no event triggered");
+        return;
+    } else {
+        let rando = Math.floor(Math.random() * 100);
+        if (rando < 30) {
+            console.log("no event triggered");
+            return;
+        } else {
+            if (rando < 40) {
+                if (declinedDemon == true && getCookie("angelPerk-0") != "true") {
+                    startEvent("perkAngel0");
+                    return;
+                } else if (declinedDemon = false && getCookie("demonPerk-0") != "true") {
+                    startEvent("perkDemon0");
+                    return;
+                }
+            }
+            startEvent(randomPerkEvents[Math.floor(Math.random()*(randomPerkEvents.length))]);
+        }
+    }
+}
+setInterval(triggerRandomEvent, 1000 * 60 * 2);
+
 let eventArrays = {
-    "endEvent": [ () => true, (perkID) => addPerk(perkID) ],
+    "endEvent": [ () => true, (perkID) => addPerk(perkID), (cookieName) => setCookie(cookieName, "true") ],
     "fallbackEvent": ["ERROR", "no event found", "", "./images/figmentFullBody.png", "exit", "endEvent0", false, false, false, false],
     "tutorial0": ["Tutorial", "Hi! My name's Figment.", "Welcome to my croc factory!", "./images/figmentFullBody.png", "--->", "tutorial1", false, false, false, false],
         "tutorial1": ["Tutorial", "I need your help, and I hear you're one of the best croc factory operators around.", "We need to manufacture as many crocs as possible, otherwise...", "./images/figmentFullBody.png", "--->", "tutorial2", false, false, false, false],
@@ -257,8 +307,33 @@ let eventArrays = {
         "mrSealIntro3": ["", "If you keep clicking fast enough for enough time, Greg and I will start dancing!", "Eventually, we'll also be able to use the power of the COMBO BAR to augment your factory's output. Try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
     "firstPurchase0": ["", "It looks like you have enough crocs to pay someone to help you!", "It's important that we manufacture crocs for the general public, but we can also melt some of them down and use the resulting carcinogenic goop as payment for our employees.", "./images/figmentFullBody.png", "--->", "firstPurchase1", false, false, false, false],
         "firstPurchase1": ["", "Your employees' output will also be affected by me and Greg's COMBO BAR.", "Hire a skeleton and try it out!", "./gifs/mrSeal.gif", "OKAY!", "endEvent0", false, false, false, false],
-    "perkGraveyard0": ["Calcium-based employees LOVE you!!!", `You've employed ${graveyardPerkThreshhold} skeletons. Groovy!`, "This has emboldened your skeletons to form a union. Awesome!", "./gifs/dance-skeleton.gif", "--->", "perkGraveyard1", false, false, false, false],
-        "perkGraveyard1": ["Calcium-based employees LOVE you!!!", "Being in a union has greatly improved your skeletons' quality of life, which has in turn increased their output at the factory!", `You have received the ${perksLibrary.find(item => item.id == "graveyardPerk").name}.`, "./gifs/graveyardDance.gif", "OKAY!", "endEvent1graveyardPerk", false, false, false, false],
+    "perkGraveyard0": ["Calcium-based employees LOVE you!!!", `You've employed ${graveyardPerkThresh} skeletons. Groovy!`, "This has emboldened your skeletons to form a union. Awesome!", "./gifs/dance-skeleton.gif", "--->", "perkGraveyard1", false, false, false, false],
+        "perkGraveyard1": ["Calcium-based employees LOVE you!!!", "Being in a union has greatly improved your skeletons' quality of life, which has in turn increased their output at the factory!", `You have received ${perksLibrary.find(item => item.id == "graveyardPerk").name}.`, "./gifs/graveyardDance.gif", "OKAY!", "endEvent1graveyardPerk", false, false, false, false],
+    "perkPunch0": ["punch has found a friend!", "hewwo! i am punch.", "thank you for fwend.", "./images/punchAndFriend.png", "--->", "perkPunch1", false, false, false, false],
+        "perkPunch1": ["punch has found a friend!", "luv you <3", `(You have received ${perksLibrary.find(item => item.id == "punchPerk").name}.)`, "./images/punchAndFriend.png", "OKAY!", "endEvent1punchPerk", false, false, false, false],
+    "perkEgoDeath0": ["You achieved ego death!", ":)", "", "./gifs/pedro-pascal.gif", "--->", "perkEgoDeath1", false, false, false, false],
+        "perkEgoDeath1": ["You achieved ego death!", `You have received ${perksLibrary.find(item => item.id == "egoDeathPerk").name}.`, "", "./gifs/pedro-pascal.gif", "OKAY!", "endEvent1egoDeathPerk", false, false, false, false],
+    
+    "perkNye0": ["Bill Nye appeared!", "Howdy! You've been doing quite laudable work here at the factory.", "Creation, innovation, experimentation; you're thinking like a true scientist!", "./images/billNye0.jpg", "--->", "perkNye1", false, false, false, false],
+        "perkNye1": ["Bill Nye appeared!", "Always remember: SCIENCE RULES!", `You have received ${perksLibrary.find(item => item.id == "nyePerk").name}.`, "./images/billNye0.jpg", "OKAY!", "endEvent1nyePerk", false, false, false, false],
+    "perkFrench0": ["The presidents of France and Brazil have fallen in love!", "The world will be born anew under the new world order created by this beautiful romance.", "", "./images/franceAndBrazil.png", "--->", "perkFrench1", false, false, false, false],
+        "perkFrench1": ["The presidents of France and Brazil have fallen in love!", "Always remember: LOVE WINS!", `You have received ${perksLibrary.find(item => item.id == "frenchPerk").name}.`, "./images/franceAndBrazil.png", "OKAY!", "endEvent1frenchPerk", false, false, false, false],
+    "perkRobert0": ["Robert Pattinson appeared!", "What just happened?", "Why am I here?", "./images/robFit.jpg", "--->", "perkRobert1", false, false, false, false],
+        "perkRobert1": ["Robert Pattinson appeared!", `You have received ${perksLibrary.find(item => item.id == "robertPerk").name}.`, "", "./images/robFit.jpg", "OKAY!", "endEvent1robertPerk", false, false, false, false],
+    "perkGirl0": ["Girl who is going to be okay appeared!", "Hi! I am going to be okay.", "The rumors of my not-okayness have been, to say the least, greatly exaggerated. A cinephile like myself will always find solace sitting down at an AMC with a Mr. Pibb.", "./images/girl.jpg", "--->", "perkGirl1", false, false, false, false],
+        "perkGirl1": ["Girl who is going to be okay appeared!", `You have received ${perksLibrary.find(item => item.id == "girlPerk").name}.`, "", "./images/girl.jpg", "OKAY!", "endEvent1girlPerk", false, false, false, false],
+    "perkJordan0": ["Jordan Peterson appeared!", "Hey, liberal! Nice haircut!", "Where'd you get it, the liberal haircut store?", "./images/jordan.jpeg", "--->", "perkJordan1", false, false, false, false],
+        "perkJordan1": ["Jordan Peterson appeared!", `You have received ${perksLibrary.find(item => item.id == "jordanPerk").name}.`, "", "./images/jordan.jpeg", "OKAY!", "endEvent1jordanPerk", false, false, false, false],
+
+    "perkDemon0": ["A demon appeared!", "Hey. I've got a deal for ya.", "", "./images/davidTennant.jpg", "--->", "perkDemon1", false, false, false, false],
+        "perkDemon1": ["A demon appeared!", `If you take the deal, you'll receive ${perksLibrary.find(item => item.id == "demonPerk").desc}, but I'll give you 5 mutant nubbys for free immediately.`, "Whaddyasay?", "./images/davidTennant.jpg", "TAKE DEAL", "perkDemon2", "DECLINE DEAL", "perkDemon3", false, false],
+        "perkDemon2": ["A demon appeared!", `Excellent choice.`, `You have received ${perksLibrary.find(item => item.id == "demonPerk").name}.`, "./images/davidTennant.jpg", "OKAY!", "endEvent1demonPerk", false, false, false, false],
+        "perkDemon3": ["A demon appeared!", `Your loss.`, "Loser.", "./images/davidTennant.jpg", "OKAY!", "endEvent2declined-demon", false, false, false, false],
+    "perkAngel0": ["An angel appeared!", "...", "", "./gifs/angel.gif", "--->", "perkAngel1", false, false, false, false],
+        "perkAngel1": ["An angel appeared!", "☝︎□︎□︎♎︎ ⬥︎□︎❒︎🙵 ❒︎♏︎⬧︎♓︎⬧︎⧫︎♓︎■︎♑︎ ⧫︎♒︎♋︎⧫︎ ♎︎♏︎❍︎□︎■︎🕯︎⬧︎ ⧫︎♏︎❍︎◻︎⧫︎♋︎⧫︎♓︎□︎■︎⬧︎ ♏︎♋︎❒︎●︎♓︎♏︎❒︎📬︎", "(Good work resisting that demon's temptations earlier.)", "./gifs/angel.gif", "--->", "perkAngel2", false, false, false, false],
+        "perkAngel2": ["An angel appeared!", "✡︎□︎◆︎ ♎︎♏︎⬧︎♏︎❒︎❖︎♏︎ ♋︎ ⬧︎♏︎♋︎⧫︎ ♋︎●︎□︎■︎♑︎⬧︎♓︎♎︎♏︎ ❍︎⍓︎ ♍︎□︎❍︎❍︎♋︎■︎♎︎♏︎❒︎📪︎ ✌︎❒︎♍︎♒︎♋︎■︎♑︎♏︎●︎ 💣︎♓︎♍︎♒︎♋︎♏︎●︎📬︎", "(You deserve a seat alongside my commander, Archangel Michael.)", "./gifs/angel.gif", "--->", "perkAngel3", false, false, false, false],
+        "perkAngel3": ["An angel appeared!", "❄︎♒︎♏︎ ❒︎♋︎◻︎⧫︎◆︎❒︎♏︎ ♐︎♋︎⬧︎⧫︎ ♋︎◻︎◻︎❒︎□︎♋︎♍︎♒︎♏︎⬧︎📬︎ ✡︎□︎◆︎ ⬥︎♓︎●︎●︎ ⬧︎♓︎⧫︎ ♒︎♓︎♑︎♒︎ ♋︎♌︎□︎❖︎♏︎ ⧫︎♒︎♏︎ ⬧︎♏︎♋︎ □︎♐︎ ⬧︎♓︎■︎■︎♏︎❒︎⬧︎📬︎", "(The rapture fast approaches. You will sit high above the sea of sinners.)", "./gifs/angel.gif", "--->", "perkAngel4", false, false, false, false],
+        "perkAngel4": ["An angel appeared!", `You have received ${perksLibrary.find(item => item.id == "angelPerk").name}.`, "", "./gifs/angel.gif", "OKAY!", "endEvent1angelPerk", false, false, false, false],
 };
 const eventModal = document.querySelector("#event-modal");
 const eventTitle = document.querySelector("#event-modal h2");
@@ -296,13 +371,13 @@ function startEvent(eventName) {
 
 let shopItems = [
     { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 100, stats: 5 },
-    { name: "nubby", src: "./gifs/nubby.gif", price: 1000, stats: 10 },
-    { name: "rubber-chicken", src: "./gifs/rubberChicken.gif", price: 5000, stats: 20 },
-    { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 50000, stats: 50 },
-    { name: "turtle", src: "./gifs/turtle.gif", price: 100000, stats: 75 },
-    { name: "mutant-nubby", src: "./gifs/mutantNubby.gif", price: 500000, stats: 100 },
-    { name: "punch", src: "./gifs/punch.gif", price: 1000000, stats: 250 },
-    { name: "pingu", src: "./gifs/pingu.gif", price: 20000000, stats: 500 },
+    { name: "nubby", src: "./gifs/nubby.gif", price: 10000, stats: 10 },
+    { name: "rubber-chicken", src: "./gifs/rubberChicken.gif", price: 500000, stats: 20 },
+    { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 8000000, stats: 100 },
+    { name: "turtle", src: "./gifs/turtle.gif", price: 30000000, stats: 300 },
+    { name: "mutant-nubby", src: "./gifs/mutantNubby.gif", price: 100000000, stats: 750 },
+    { name: "punch", src: "./gifs/punch.gif", price: 900000000, stats: 1500 },
+    { name: "pingu", src: "./gifs/pingu.gif", price: Math.pow(10, 13), stats: 4000 },
     { name: "ego-death", src: "./gifs/pedro-pascal.gif", price: Math.pow(10, 100), stats: 67 }
 ];
 
@@ -343,8 +418,14 @@ function purchaseItem(obj) {
         updateEmployedEntities();
         updateCookies();
         updateShopBtns();
-        if (obj.name == "skeleton" && getCookie("skeletons-employed") == graveyardPerkThreshhold) {
+        if (obj.name == "skeleton" && getCookie("skeletons-employed") == graveyardPerkThresh) {
             startEvent("perkGraveyard0");
+        }
+        if (obj.name == "punch" && getCookie("punchs-employed") == punchPerkThresh) {
+            startEvent("perkPunch0");
+        }
+        if (obj.name =="ego-death" && getCookie("ego-deaths-employed") == egoDeathPerkThresh) {
+            startEvent("perkEgoDeath0");
         }
     }
 }
@@ -360,6 +441,12 @@ function updateShopBtns() {
     })
 }
 updateShopBtns();
+
+function truncateToTwoDecimals(val) {
+    const multiplied = val * 100;
+    const truncated = Math.trunc(multiplied);
+    return truncated / 100;
+}
 
 function makeEntityDiv(obj) {
     const entityDiv = document.createElement("div");
