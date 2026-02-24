@@ -423,7 +423,7 @@ function triggerRandomEvent() {
         }
     }
 }
-setInterval(triggerRandomEvent, 1000 * 10);
+setInterval(triggerRandomEvent, 1000 * 60 * 2);
 
 const perksDiv = document.querySelector("#perks");
 function addPerk(perkID) {
