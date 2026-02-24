@@ -114,6 +114,10 @@ body {
     background-color: black;
 }
 
+#perks > div.negative img {
+    animation: none;
+}
+
 #factory-heart {
     width: 65%;
     height: 100%;
