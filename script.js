@@ -75,6 +75,7 @@ factoryDoorBtn.addEventListener("click", (e) => {
     populateFromCookies();
     loadSavedEntities();
     loadSavedPerks();
+    setInterval(triggerRandomEvent, 1000 * 60 * 2);
     setTimeout(() => factoryDoor.classList.add("hidden"), 2000);
 })
 
@@ -215,7 +216,7 @@ function updateCombo() {
 setInterval(updateCombo, 100);
 
 let shopItems = [
-    { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 1, stats: 5 },
+    { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 100, stats: 5 },
     { name: "nubby", src: "./gifs/nubby.gif", price: 10000, stats: 10 },
     { name: "rubber-chicken", src: "./gifs/rubberChicken.gif", price: 500000, stats: 20 },
     { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 8000000, stats: 100 },
@@ -287,7 +288,7 @@ function updateShopBtns() {
 }
 updateShopBtns();
 
-let graveyardPerkThresh = 2;
+let graveyardPerkThresh = 20;
 let punchPerkThresh = 2;
 let egoDeathPerkThresh = 1;
 let randomPerkEvents = ["perkNye0", "perkFrench0", "perkRobert0", "perkGirl0", "perkJordan0"];
@@ -423,7 +424,6 @@ function triggerRandomEvent() {
         }
     }
 }
-setInterval(triggerRandomEvent, 1000 * 60 * 2);
 
 const perksDiv = document.querySelector("#perks");
 function addPerk(perkID) {
