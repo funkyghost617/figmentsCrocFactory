@@ -408,7 +408,7 @@ function triggerRandomEvent() {
     } else {
         let rando = Math.floor(Math.random() * 100);
         if (rando < 30) {
-            console.log("no event triggered");
+            startEvent(randomPerkEvents[Math.floor(Math.random()*(randomPerkEvents.length))]);
             return;
         } else {
             if (rando < 40) {
