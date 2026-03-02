@@ -44,7 +44,7 @@ reloadPageBtn.addEventListener("click", (e) => {
 // startup variable management and display population
 let mainMusic;
 let soundEffects = [];
-let currentVersion = "1.1";
+let currentVersion = "1.2";
 if (getCookie("version") && getCookie("version") != currentVersion) {
     alert("The game has been updated since you last played. All your data will be reset. Good luck on your next adventure!");
     deleteAllCookies();
@@ -137,11 +137,12 @@ function makeCroc(number = 1, source = "click", e) {
         }
         particle.style.left = `${e.clientX - 30 + window.scrollX}px`;
         particle.style.top = `${e.clientY - 50 + window.scrollY}px`;
+        particle.textContent = "+" + Math.floor(1 * comboMult * number);
     } else {
         particle.style.left = `${e.getBoundingClientRect().left + window.scrollX + Math.floor(e.getBoundingClientRect().width * 0.5) - 10}px`;
         particle.style.top = `${e.getBoundingClientRect().top + window.scrollY + Math.floor(e.getBoundingClientRect().height * 0.5)}px`;
+        particle.textContent = "+" + Math.floor(1 * comboMult * number * Number(e.textContent));
     }
-    particle.textContent = "+" + Math.floor(1 * comboMult * number);
     particleDiv.appendChild(particle);
     particle.addEventListener("animationend", () => particle.remove());
     
@@ -216,14 +217,14 @@ function updateCombo() {
 setInterval(updateCombo, 100);
 
 let shopItems = [
-    { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 100, stats: 5 },
-    { name: "nubby", src: "./gifs/nubby.gif", price: 10000, stats: 10 },
-    { name: "rubber-chicken", src: "./gifs/rubberChicken.gif", price: 500000, stats: 20 },
-    { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 8000000, stats: 100 },
-    { name: "turtle", src: "./gifs/turtle.gif", price: 30000000, stats: 300 },
-    { name: "mutant-nubby", src: "./gifs/mutantNubby.gif", price: 100000000, stats: 750 },
-    { name: "punch", src: "./gifs/punch.gif", price: 900000000, stats: 1500 },
-    { name: "pingu", src: "./gifs/pingu.gif", price: Math.pow(10, 13), stats: 4000 },
+    { name: "skeleton", src: "./gifs/dance-skeleton.gif", price: 100, stats: 1 },
+    { name: "nubby", src: "./gifs/nubby.gif", price: 666, stats: 10 },
+    { name: "rubber-chicken", src: "./gifs/rubberChicken.gif", price: 7000, stats: 150 },
+    { name: "unicycle-frog", src: "./gifs/unicycleFrog.gif", price: 100000, stats: 2500 },
+    { name: "turtle", src: "./gifs/turtle.gif", price: 30000000, stats: 400000 },
+    { name: "mutant-nubby", src: "./gifs/mutantNubby.gif", price: 100000000, stats: 5000000 },
+    { name: "punch", src: "./gifs/punch.gif", price: 900000000, stats: 90000000 },
+    { name: "pingu", src: "./gifs/pingu.gif", price: Math.pow(10, 16), stats: 222222222222 },
     { name: "ego-death", src: "./gifs/pedro-pascal.gif", price: Math.pow(10, 100), stats: 67 }
 ];
 
@@ -494,29 +495,43 @@ function playSound(filepath) {
 }
 
 function makeEntityDiv(obj) {
-    const entityDiv = document.createElement("div");
-    const entityImg = document.createElement("img");
-    entityImg.setAttribute("src", obj.src);
-    entityDiv.appendChild(entityImg);
     const entityTypeDiv = document.querySelector(`#${obj.name}s`);
-    entityTypeDiv.appendChild(entityDiv);
+    if (entityTypeDiv.childNodes.length == 0) {
+        const entityTypeImg = document.createElement("img");
+        entityTypeImg.setAttribute("src", obj.src);
+        entityTypeDiv.appendChild(entityTypeImg);
+        const entityCountSpan = document.createElement("span");
+        const entityCountPara = document.createElement("p");
+        entityCountPara.textContent = `${obj.name}s currently employed: `;
+        entityCountPara.appendChild(entityCountSpan);
+        entityCountSpan.textContent = 1;
+        entityTypeDiv.appendChild(entityCountPara);
+    } else {
+        const entityCountSpan = document.querySelector(`#${obj.name}s span`);
+        entityCountSpan.textContent = Number(entityCountSpan.textContent) + 1;
+    }
 }
 
 const entityTypeDivs = document.querySelectorAll("#active-entities-div > div");
 function workersTick() {
     entityTypeDivs.forEach((type) => {
         const shopObj = shopItems.find(obj => obj.name == String(type.getAttribute("id")).slice(0, -1));
-        const childDivs = type.childNodes;
-        childDivs.forEach((child) => {
-            makeCroc(shopObj.stats, "entity", child);   
-        })
+        const entityCountSpan = document.querySelector(`#${type.id} span`);
+        if (entityCountSpan) {
+            for (let i = 0; i < Number(entityCountSpan.textContent); i++) {
+                makeCroc(shopObj.stats, "entity", entityCountSpan); 
+            }
+        }
     })
 }
 setInterval(workersTick, 1000);
 
 function updateEmployedEntities() {
     entityTypeDivs.forEach((type) => {
-        setCookie(`${type.id}-employed`, type.childNodes.length, 365);
+        const entityCountSpan = document.querySelector(`#${type.id} span`);
+        if (entityCountSpan) {
+            setCookie(`${type.id}-employed`, Number(entityCountSpan.textContent), 365);
+        }
     })
 }
 
